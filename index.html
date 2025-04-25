@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <title>学信档案</title>
+    <meta name="keywords" content="学信档案，高等教育信息，学籍学历，图片校对">
+    <meta name="description" content=""学信档案"是中国高等教育学生信息网（简称"学信网"）各类学生个人信息档案的总称，涉及全国高等教育学生信息数据库中各类学生的学籍、学历、招生录取、助学贷款等信息。">
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+    <meta name="format-detection" content="telephone=no, email=no">
+    <!-- 目的是为了用户在使用谷歌系浏览器时 跳转到机器人模块后 可以读取完整referer -->
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    
+    
+    
+    
+    
+    <link rel="icon" href="https://t1.chei.com.cn/archive/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href='static/css/bootstrap.min.css' />
+    <link rel="stylesheet" href='static/css/iconfont.css' />
+    <link rel="stylesheet" href='static/css/chsi-font.css'>
+    <link rel="stylesheet" href='static/css/archive.min.css' />
+    <script src='static/js/jquery.min.js'></script>
+    <script src='static/js/layer.js' ></script>
+    <script src='static/js/lodash.min.js' ></script>
+    <script src='static/js/vue.min.js'></script>
+    <script type="text/javascript" src='static/js/axios.min.js'></script>
+    <script type="text/javascript" src='static/js/qs.js'></script>
+    <script src='static/js/vee-validate.2.0.0-rc.25.js'></script>
+    <script src='static/js/iview.min.js'></script>
+    <script>
+        function addCookie(name,value,exdays,path){
+            var cookieString=name+"="+escape(value);
+            if(exdays){
+                 var expirationDate = new Date();
+                expirationDate.setTime(expirationDate.getTime()+(exdays*24*60*60*1000));
+                cookieString+="; expires="+expirationDate.toUTCString()
+            }
+            if(path){
+                cookieString+="; path=/"+path;
+            }
+            document.cookie=cookieString;
+            document.cookie.setSecure=true;//只允许在https环境下使用cookie
+        }
+        function getCookie(name){
+            var strCookie=document.cookie;
+            var arrCookie=strCookie.split("; ");
+            for(var i=0;i<arrCookie.length;i++){
+                var arr=arrCookie[i].split("=");
+                if(arr[0]==name)return arr[1];
+            }
+            return "";
+        }
+    </script>
+    
+    <style>
+        /* 编辑工具样式 */
+        #edit-tool {
+            position: fixed;
+            top: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid #ddd;
+            padding: 15px;
+            width: 320px;
+            max-height: 100vh;
+            overflow-y: auto;
+            z-index: 9999;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            transform: translateX(100%); /* 默认完全隐藏 */
+        }
+        #edit-tool.visible {
+            transform: translateX(0);
+        }
+        #edit-tool h3 {
+            margin-top: 5px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        #edit-tool .form-group {
+            margin-bottom: 10px;
+        }
+        #edit-tool label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 3px;
+            font-size: 12px;
+        }
+        #edit-tool input, #edit-tool select {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        #edit-tool button {
+            background: #25b887;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+        #edit-tool button:hover {
+            background: #1d9c73;
+        }
+        #edit-tool .toggle-btn {
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 2px 5px;
+            background: #25b887;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            transform: translateX(-100%);
+        }
+        .form-section {
+            margin-bottom: 20px;
+        }
+        #edit-tool .photo-upload {
+            margin-top: 10px;
+        }
+        #edit-tool .photo-preview {
+            width: 60px;
+            height: 80px;
+            border: 1px solid #ddd;
+            display: inline-block;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        #edit-tool .photo-upload input {
+            display: inline-block;
+            width: 180px;
+            vertical-align: middle;
+        }
+        #edit-tool-tabs {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        #edit-tool-tabs button {
+            flex: 1;
+            background: #eee;
+            margin: 0 2px;
+            font-size: 12px;
+            padding: 5px;
+        }
+        #edit-tool-tabs button.active {
+            background: #25b887;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        /* 隐蔽触发按钮 */
+        #edit-tool-trigger {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            width: 10px;
+            height: 10px;
+            background: rgba(37, 184, 135, 0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 9999;
+        }
+        #edit-tool-trigger:hover {
+            background: rgba(37, 184, 135, 0.7);
+            transform: scale(1.2);
+        }
+        /* 热区按键提示 */
+        .shortcut-info {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px;
+            border-radius: 3px;
+            font-size: 12px;
+            z-index: 9999;
+        }
+        #edit-tool-trigger:hover + .shortcut-info {
+            display: block;
+        }
+    </style>
+<script async src="static/js/7d2612cb198547f1a141bf430dff2e4e.js"></script>
+<script>
+// 放在ga.jsp 中
+function gaTrackerOutboundLink(ele,eventCategory,eventAction,eventLabel){
+    gtag('event', eventAction, {
+      'event_category': eventCategory,
+      'event_label': eventLabel
+    });
+    return true;
+}
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-100524-5', {'sample_rate': 5});
+</script>
+<script>
+    // 百度统计
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?ed4ddcd4078a486f1f5760a6c426b738";
+        var s = document.getElementsByTagName("script")[0]; 
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+</head>
+<body>
+    <!-- 隐蔽触发按钮 -->
+    <div id="edit-tool-trigger" title="打开编辑工具"></div>
+    <div class="shortcut-info">双击此点或按Alt+E打开编辑工具</div>
+    
+    <!-- 编辑工具 -->
+    <div id="edit-tool">
+        <div class="toggle-btn" onclick="toggleEditTool()">≡</div>
+        <h3>学籍信息编辑工具</h3>
+        
+        <div id="edit-tool-tabs">
+            <button onclick="switchTab(1)" class="active">学籍1</button>
+            <button onclick="switchTab(2)">学籍2</button>
+            <button onclick="switchTab(3)">照片</button>
+        </div>
+        
+        <!-- 学籍1编辑表单 -->
+        <div id="tab-1" class="tab-content active">
+            <div class="form-section">
+                <div class="form-group">
+                    <label>学籍标题</label>
+                    <input type="text" id="xj1-title" value="">
+                </div>
+                <div class="form-group">
+                    <label>姓名</label>
+                    <input type="text" id="xj1-name" value="">
+                </div>
+                <div class="form-group">
+                    <label>性别</label>
+                    <select id="xj1-gender">
+                        <option value="">请选择</option>
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>出生日期</label>
+                    <input type="text" id="xj1-birthday" value="">
+                </div>
+                <div class="form-group">
+                    <label>民族</label>
+                    <input type="text" id="xj1-nation" value="">
+                </div>
+                <div class="form-group">
+                    <label>证件号码</label>
+                    <input type="text" id="xj1-id" value="">
+                </div>
+                <div class="form-group">
+                    <label>学校名称</label>
+                    <input type="text" id="xj1-school" value="">
+                </div>
+                <div class="form-group">
+                    <label>层次</label>
+                    <input type="text" id="xj1-level" value="">
+                </div>
+                <div class="form-group">
+                    <label>专业</label>
+                    <input type="text" id="xj1-major" value="">
+                </div>
+                <div class="form-group">
+                    <label>学制</label>
+                    <input type="text" id="xj1-years" value="">
+                </div>
+                <div class="form-group">
+                    <label>学历类别</label>
+                    <input type="text" id="xj1-edu-type" value="">
+                </div>
+                <div class="form-group">
+                    <label>学习形式</label>
+                    <input type="text" id="xj1-study-type" value="">
+                </div>
+                <div class="form-group">
+                    <label>系所</label>
+                    <input type="text" id="xj1-department" value="">
+                </div>
+                <div class="form-group">
+                    <label>班级</label>
+                    <input type="text" id="xj1-class" value="">
+                </div>
+                <div class="form-group">
+                    <label>学号</label>
+                    <input type="text" id="xj1-student-id" value="">
+                </div>
+                <div class="form-group">
+                    <label>入学日期</label>
+                    <input type="text" id="xj1-enroll-date" value="">
+                </div>
+                <div class="form-group">
+                    <label>学籍状态</label>
+                    <input type="text" id="xj1-status" value="">
+                </div>
+                <div class="form-group">
+                    <label>预计毕业日期</label>
+                    <input type="text" id="xj1-graduate-date" value="">
+                </div>
+                <button onclick="updateXj1Info()">更新学籍1信息</button>
+            </div>
+        </div>
+        
+        <!-- 学籍2编辑表单 -->
+        <div id="tab-2" class="tab-content">
+            <div class="form-section">
+                <div class="form-group">
+                    <label>学籍标题</label>
+                    <input type="text" id="xj2-title" value="">
+                </div>
+                <div class="form-group">
+                    <label>姓名</label>
+                    <input type="text" id="xj2-name" value="">
+                </div>
+                <div class="form-group">
+                    <label>性别</label>
+                    <select id="xj2-gender">
+                        <option value="">请选择</option>
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>出生日期</label>
+                    <input type="text" id="xj2-birthday" value="">
+                </div>
+                <div class="form-group">
+                    <label>民族</label>
+                    <input type="text" id="xj2-nation" value="">
+                </div>
+                <div class="form-group">
+                    <label>证件号码</label>
+                    <input type="text" id="xj2-id" value="">
+                </div>
+                <div class="form-group">
+                    <label>学校名称</label>
+                    <input type="text" id="xj2-school" value="">
+                </div>
+                <div class="form-group">
+                    <label>层次</label>
+                    <input type="text" id="xj2-level" value="">
+                </div>
+                <div class="form-group">
+                    <label>专业</label>
+                    <input type="text" id="xj2-major" value="">
+                </div>
+                <div class="form-group">
+                    <label>学制</label>
+                    <input type="text" id="xj2-years" value="">
+                </div>
+                <div class="form-group">
+                    <label>学历类别</label>
+                    <input type="text" id="xj2-edu-type" value="">
+                </div>
+                <div class="form-group">
+                    <label>学习形式</label>
+                    <input type="text" id="xj2-study-type" value="">
+                </div>
+                <div class="form-group">
+                    <label>系所</label>
+                    <input type="text" id="xj2-department" value="">
+                </div>
+                <div class="form-group">
+                    <label>班级</label>
+                    <input type="text" id="xj2-class" value="">
+                </div>
+                <div class="form-group">
+                    <label>学号</label>
+                    <input type="text" id="xj2-student-id" value="">
+                </div>
+                <div class="form-group">
+                    <label>入学日期</label>
+                    <input type="text" id="xj2-enroll-date" value="">
+                </div>
+                <div class="form-group">
+                    <label>学籍状态</label>
+                    <input type="text" id="xj2-status" value="">
+                </div>
+                <div class="form-group">
+                    <label>离校日期</label>
+                    <input type="text" id="xj2-leave-date" value="">
+                </div>
+                <button onclick="updateXj2Info()">更新学籍2信息</button>
+            </div>
+        </div>
+        
+        <!-- 照片编辑表单 -->
+        <div id="tab-3" class="tab-content">
+            <div class="form-section">
+                <h3>照片替换</h3>
+                <p>选择本地照片替换原有照片</p>
+                
+                <div class="form-group">
+                    <label>学籍1录取照片</label>
+                    <div class="photo-upload">
+                        <img src="static/picture/no-photo.png" class="photo-preview" id="preview-lq1">
+                        <input type="file" id="lq1-upload" accept="image/*" onchange="previewImage(this, 'preview-lq1')">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>学籍1学历照片</label>
+                    <div class="photo-upload">
+                        <img src="static/picture/no-photo.png" class="photo-preview" id="preview-xl1">
+                        <input type="file" id="xl1-upload" accept="image/*" onchange="previewImage(this, 'preview-xl1')">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>学籍2录取照片</label>
+                    <div class="photo-upload">
+                        <img src="static/picture/no-photo.png" class="photo-preview" id="preview-lq2">
+                        <input type="file" id="lq2-upload" accept="image/*" onchange="previewImage(this, 'preview-lq2')">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>学籍2学历照片</label>
+                    <div class="photo-upload">
+                        <img src="static/picture/no-photo.png" class="photo-preview" id="preview-xl2">
+                        <input type="file" id="xl2-upload" accept="image/*" onchange="previewImage(this, 'preview-xl2')">
+                    </div>
+                </div>
+                
+                <button onclick="replacePhotos()">更新所有照片</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 编辑工具切换显示/隐藏
+        function toggleEditTool() {
+            var tool = document.getElementById('edit-tool');
+            tool.classList.toggle('visible');
+        }
+        
+        // 切换标签页
+        function switchTab(tabNum) {
+            // 重置所有标签
+            document.querySelectorAll('#edit-tool-tabs button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 激活选择的标签
+            document.querySelector('#edit-tool-tabs button:nth-child(' + tabNum + ')').classList.add('active');
+            document.getElementById('tab-' + tabNum).classList.add('active');
+        }
+        
+        // 预览图片
+        function previewImage(input, previewId) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    document.getElementById(previewId).src = e.target.result;
+                }
+                
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        // 更新学籍1信息
+        function updateXj1Info() {
+            // 获取表单值
+            var title = document.getElementById('xj1-title').value;
+            var name = document.getElementById('xj1-name').value;
+            var gender = document.getElementById('xj1-gender').value;
+            var birthday = document.getElementById('xj1-birthday').value;
+            var nation = document.getElementById('xj1-nation').value;
+            var id = document.getElementById('xj1-id').value;
+            var school = document.getElementById('xj1-school').value;
+            var level = document.getElementById('xj1-level').value;
+            var major = document.getElementById('xj1-major').value;
+            var years = document.getElementById('xj1-years').value;
+            var eduType = document.getElementById('xj1-edu-type').value;
+            var studyType = document.getElementById('xj1-study-type').value;
+            var department = document.getElementById('xj1-department').value;
+            var className = document.getElementById('xj1-class').value;
+            var studentId = document.getElementById('xj1-student-id').value;
+            var enrollDate = document.getElementById('xj1-enroll-date').value;
+            var status = document.getElementById('xj1-status').value;
+            var graduateDate = document.getElementById('xj1-graduate-date').value;
+            
+            // 更新页面上的信息
+            document.getElementById('xj_top_1').textContent = title;
+            
+            // 构建新的学籍信息HTML
+            var newXjDetail = "<table class='gdjy-table'>";
+            newXjDetail += "<tr><th width='130'>姓名：</th><td width='206'>" + name + "</td><th width='100'>性别：</th><td>" + gender + "</td></tr>";
+            newXjDetail += "<tr><th>出生日期：</th><td>" + birthday + "</td><th>民族：</th><td>" + nation + "</td></tr>";
+            newXjDetail += "<tr><th>证件号码：</th><td>" + id + "</td><th>学校名称：</th><td>" + school + "</td></tr>";
+            newXjDetail += "<tr><th>层次：</th><td>" + level + "</td><th>专业：</th><td>" + major + "</td></tr>";
+            newXjDetail += "<tr><th>学制：</th><td>" + years + "</td><th>学历类别：</th><td>" + eduType + "</td></tr>";
+            newXjDetail += "<tr><th>学习形式：</th><td>" + studyType + "</td><th>分院：</th><td></td></tr>";
+            newXjDetail += "<tr><th>系所：</th><td>" + department + "</td><th>班级：</th><td>" + className + "</td></tr>";
+            newXjDetail += "<tr><th>学号：</th><td>" + studentId + "</td><th>入学日期：</th><td>" + enrollDate + "</td></tr>";
+            newXjDetail += "<tr><th>学籍状态：</th><td>" + status + "</td><th>预计毕业日期：</th><td>" + graduateDate + "</td></tr>";
+            newXjDetail += "</table>";
+            
+            // 更新到页面
+            document.getElementById('xjMR_1').innerHTML = newXjDetail;
+            
+            alert('学籍1信息已更新！');
+        }
+        
+        // 更新学籍2信息
+        function updateXj2Info() {
+            // 获取表单值
+            var title = document.getElementById('xj2-title').value;
+            var name = document.getElementById('xj2-name').value;
+            var gender = document.getElementById('xj2-gender').value;
+            var birthday = document.getElementById('xj2-birthday').value;
+            var nation = document.getElementById('xj2-nation').value;
+            var id = document.getElementById('xj2-id').value;
+            var school = document.getElementById('xj2-school').value;
+            var level = document.getElementById('xj2-level').value;
+            var major = document.getElementById('xj2-major').value;
+            var years = document.getElementById('xj2-years').value;
+            var eduType = document.getElementById('xj2-edu-type').value;
+            var studyType = document.getElementById('xj2-study-type').value;
+            var department = document.getElementById('xj2-department').value;
+            var className = document.getElementById('xj2-class').value;
+            var studentId = document.getElementById('xj2-student-id').value;
+            var enrollDate = document.getElementById('xj2-enroll-date').value;
+            var status = document.getElementById('xj2-status').value;
+            var leaveDate = document.getElementById('xj2-leave-date').value;
+            
+            // 更新页面上的信息
+            document.getElementById('xj_top_2').textContent = title;
+            
+            // 构建新的学籍信息HTML
+            var newXjDetail = "<table class='gdjy-table'>";
+            newXjDetail += "<tr><th width='130'>姓名：</th><td width='206'>" + name + "</td><th width='100'>性别：</th><td>" + gender + "</td></tr>";
+            newXjDetail += "<tr><th>出生日期：</th><td>" + birthday + "</td><th>民族：</th><td>" + nation + "</td></tr>";
+            newXjDetail += "<tr><th>证件号码：</th><td>" + id + "</td><th>学校名称：</th><td>" + school + "</td></tr>";
+            newXjDetail += "<tr><th>层次：</th><td>" + level + "</td><th>专业：</th><td>" + major + "</td></tr>";
+            newXjDetail += "<tr><th>学制：</th><td>" + years + "</td><th>学历类别：</th><td>" + eduType + "</td></tr>";
+            newXjDetail += "<tr><th>学习形式：</th><td>" + studyType + "</td><th>分院：</th><td></td></tr>";
+            newXjDetail += "<tr><th>系所：</th><td>" + department + "</td><th>班级：</th><td>" + className + "</td></tr>";
+            newXjDetail += "<tr><th>学号：</th><td>" + studentId + "</td><th>入学日期：</th><td>" + enrollDate + "</td></tr>";
+            newXjDetail += "<tr><th>学籍状态：</th><td>" + status + "</td><th>离校日期：</th><td>" + leaveDate + "</td></tr>";
+            newXjDetail += "</table>";
+            
+            // 更新到页面
+            document.getElementById('xjMR_2').innerHTML = newXjDetail;
+            
+            alert('学籍2信息已更新！');
+        }
+        
+        // 替换照片函数
+        function replacePhotos() {
+            // 获取文件输入域
+            var lq1Upload = document.getElementById('lq1-upload');
+            var xl1Upload = document.getElementById('xl1-upload');
+            var lq2Upload = document.getElementById('lq2-upload');
+            var xl2Upload = document.getElementById('xl2-upload');
+            
+            // 替换照片
+            if (lq1Upload.files && lq1Upload.files[0]) {
+                var allLq1Images = document.querySelectorAll('.m-left:nth-child(1) .xj-m-left .pic:nth-child(1) img');
+                allLq1Images.forEach(function(img) {
+                    img.src = URL.createObjectURL(lq1Upload.files[0]);
+                });
+            }
+            
+            if (xl1Upload.files && xl1Upload.files[0]) {
+                var allXl1Images = document.querySelectorAll('.m-left:nth-child(1) .xj-m-left .pic:nth-child(3) img');
+                allXl1Images.forEach(function(img) {
+                    img.src = URL.createObjectURL(xl1Upload.files[0]);
+                });
+            }
+            
+            if (lq2Upload.files && lq2Upload.files[0]) {
+                var allLq2Images = document.querySelectorAll('.m-left:nth-child(2) .xj-m-left .pic:nth-child(1) img');
+                allLq2Images.forEach(function(img) {
+                    img.src = URL.createObjectURL(lq2Upload.files[0]);
+                });
+            }
+            
+            if (xl2Upload.files && xl2Upload.files[0]) {
+                var allXl2Images = document.querySelectorAll('.m-left:nth-child(2) .xj-m-left .pic:nth-child(3) img');
+                allXl2Images.forEach(function(img) {
+                    img.src = URL.createObjectURL(xl2Upload.files[0]);
+                });
+            }
+            
+            alert('照片已更新！更新的照片仅在本次访问有效，刷新页面后需重新更新。');
+        }
+        
+        // 初始化工具显示
+        document.addEventListener('DOMContentLoaded', function() {
+            // 添加点击事件监听器到触发按钮
+            document.getElementById('edit-tool-trigger').addEventListener('dblclick', function() {
+                toggleEditTool();
+            });
+            
+            // 添加键盘快捷键(Alt+E)
+            document.addEventListener('keydown', function(e) {
+                if (e.altKey && e.key === 'e') {
+                    toggleEditTool();
+                }
+            });
+        });
+    </script>
+    
+    <style type="text/css">
+    .webuploader-container .webuploader-pick{
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+        color: #fff;
+        text-align: center;
+         border-radius:0;
+        overflow: hidden;
+        padding: 0 30px;
+        background: #25b887;
+    }
+    .pdf-show{
+        float: left;
+        display:inline-block;
+        border: 1px solid #ccc;
+        padding:0 10px;
+        width:144px;
+        height: 32px;
+        margin-right:5px;
+    }
+    .pdf-show .item{
+        display:inline-block;
+        width:144px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+    .ctl-btn{
+        vertical-align: 12px;
+    }
+    .main{
+        position: relative;
+    }
+    .ch-robot{
+        position: absolute;
+        right: -60px;
+        top: 0;
+        display: block;
+        width: 50px;
+        height: 77px;
+        margin-bottom: 10px;
+        background: url('static/images/jqr.png') no-repeat;
+    }
+    .ch-robot:hover{
+        background-position: -52px 0;
+        text-decoration: none;
+    }
+    /*专业变化入口*/
+    a.zybh-rk-btn{
+        display:block;
+        padding:3px;
+        margin: 10px 10px 20px;
+        border-radius: 6px;
+    }
+    /*毕业论文查重*/
+    a.lwcc-rk-btn{
+        display:block;
+        margin: 5px 10px 10px;
+    }
+</style>
+    <div class="outer-layer">
+        <div class="outer-layer-content">
+            
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="static/css/animate.css"> 
+<img src="static/picture/share_xxda.jpg" width='0' height='0' style='position: absolute;top:-100px;left: 0'/>
+<style type="text/css">
+    .header-nav .header-nav-bg{
+        height: 220px;
+    }
+    .header-nav dd{
+        height: 212px;
+    }
+</style>
+<div class="header">
+    <div class="width1180 clearfix">
+        <div class="logo"><a href="/archive/index.jsp" target="_parent" class="home"></a></div>
+        <div class='homePage-nav' style="margin-left:28px;">
+            <a href="/archive/index.action?trnd=21033947835114558909219310899971">首页</a>
+        </div>
+        <div id="nav-first" class='header-nav'>
+            <dl id="gdjy-nav">    
+                <dt>高等教育信息<span class="sanjiao"></span></dt>
+                <dd style='display: none'></dd>
+            </dl>
+            <dl id="bab-nav">    
+                <dt>在线验证报告<span class="sanjiao"></span></dt>
+                <dd style='display: none'></dd>
+            </dl>
+            <dl id="rzbg-nav">    
+                <dt>学历学位认证与成绩验证<span class="sanjiao"></span></dt>
+                <dd style='display: none'></dd>
+            </dl>
+            <dl id="gjhz-nav">    
+                <dt>出国报告发送<span class="sanjiao"></span></dt>
+                <dd style='display: none'></dd>
+            </dl>
+            <dl>    
+                <dt id="vote-nav">调查/投票<span class="sanjiao" style="left:46px;"></span></dt>
+                <dd style='display: none'></dd>
+            </dl>
+            <dl>    
+                <dt id="xz-nav"><a href="https://xz.chsi.com.cn/survey/index.action" class="xz-link" target="_blank">职业测评</a></dt>
+                <dd style='display: none'></dd>
+            </dl>
+            <dl>    
+                <dt id="ncss-nav"><a href="https://www.ncss.cn/" onmousedown="gaTrackerOutboundLink(this,'ncssindex', 'click', 'frommenu')" target="_blank"  class="jy-link">就业</a></dt>
+                <dd style='display: none'></dd>
+            </dl>
+            <div class="header-nav-bg" style="display:none;">&nbsp;</div>
+        </div>
+        
+        <div class="nav-userinfo">
+            
+                <div class=" btn-group">
+                    <div class="user dropdown-toggle" data-toggle="dropdown"><i class="iconfont" title="个人中心">&#xe647;</i>个人中心<span class="caret"></span>
+                    </div>
+                    <ul class="dropdown-menu" role="menu">
+                      <li><a href="https://account.chsi.com.cn/account/account!show" target="_blank" ><i class="iconfont" title="账号">&#xe645;</i>账号</a>
+                      </li>
+                      
+                      <li><a href='https://account.chsi.com.cn/passport/logout?service=https://my.chsi.com.cn/archive/index.jsp'><i class="iconfont" title="退出">&#xe695;</i>退出</a></li>
+                    </ul>
+                </div>
+            
+            
+        </div>
+    </div>
+</div>
+<div  class="sub_nav"> 
+    <div id="nav-second" class="width1180 clearfix">                                
+        <ul class="sub_nav_mian" style='display:none'>
+            <li>学籍信息/图像校对</li>
+            <li>学历信息</li>
+            <li>学位信息</li>
+            <li>考研信息</li>
+        </ul>
+        <ul class="sub_nav_mian" style='display:none'>
+            <li>首页</li>
+            <li>高等学籍</li>
+            <li>高等学历</li>
+            <li>学位</li>
+            <li>协助申请</li>
+        </ul>
+        <ul class="sub_nav_mian" style='display:none'>
+            <li>首页</li>
+            <li>绑定报告</li>
+        </ul>
+        <ul class="sub_nav_mian" style='display:none'>
+            <li>首页</li>
+            <li>传输费用</li>
+            <li>英文翻译</li>
+        </ul>
+        <ul class="sub_nav_mian" style='display:none'>
+            <li>首页</li>
+            <li>跟踪调查</li>
+            <li onmousedown="gaTrackerOutboundLink(this,'jygz', 'click', 'survey_jygz_menu')">就业跟踪</li>
+            <li>专业推荐</li>
+            <li>专业满意度</li>
+            <li>院校满意度</li>
+        </ul> 
+        <ul class="sub_nav_mian" style='display:none'>
+            <li><a href="https://xz.chsi.com.cn/home.action" target="_blank">首页</a></li>
+            <li><a href="https://xz.chsi.com.cn/speciality/index.action" target="_blank">专业洞察</a></li>
+            <li><a href="https://xz.chsi.com.cn/survey/index.action" target="_blank">职业测评</a></li>
+            <li><a href="https://xz.chsi.com.cn/occupation/index.action" target="_blank">职业探索</a></li>
+            <li><a href="https://xz.chsi.com.cn/occucase/index.action" target="_blank">职业人物</a></li>
+            <li><a href="https://xz.chsi.com.cn/jyzdk/index.action" target="_blank">就业指导课</a></li>
+        </ul>
+        <ul class="sub_nav_mian" style='display:none'>
+            <li><a href="https://www.ncss.cn/" onmousedown="gaTrackerOutboundLink(this,'ncssindex', 'click', 'frommenu')" target="_blank">首页</a></li>
+            <li><a href="https://job.ncss.cn/student/jobs/index.html" onmousedown="gaTrackerOutboundLink(this,'ncsszw', 'click', 'frommenu')" target="_blank">职位</a></li>
+            <li><a href="https://job.ncss.cn/student/company/index.html" onmousedown="gaTrackerOutboundLink(this,'ncssqy', 'click', 'frommenu')" target="_blank">企业</a></li>
+            <li><a href="https://job.ncss.cn/student/jobfair/index.html" onmousedown="gaTrackerOutboundLink(this,'ncsszph', 'click', 'frommenu')" target="_blank">招聘会</a></li>
+        </ul>
+    </div>
+</div>
+
+<script>
+var SpathMy = 'https://my.chsi.com.cn/archive/';
+var SpathGaoKao = 'https://my.chsi.com.cn/zyzsk/';
+</script>
+<script src='static/js/header-menu-1.1.8.js'></script>
+            <div class='main'>
+                <a href="//kl.chsi.com.cn/robot/index.action?system=my" target="_blank" class="ch-robot"></a>
+                <a href="/archive/survey/shgl/show.action" id="shgldcId" target="_blank" class="vote-shgldc-banner"></a>                
+                
+
+
+
+
+
+
+
+
+<script>
+(function(w, d, s, q) { 
+	w[q] =w[q] || []; 
+	var f=d.getElementsByTagName(s)[0],j=d.createElement(s); 
+	j.async=true; 
+	j.id='beacon-aplus'; 
+	j.src='https://o.alicdn.com/QTSDK/quicktracking-sdk/qt_web.umd.js'; 
+	f.parentNode.insertBefore(j, f);
+})(window, document, 'script', 'aplus_queue');
+aplus_queue.push({ action: 'aplus.setMetaInfo', arguments: ['appKey', 'sc5wvrha9o0bde9ugpoqm37u']  }) 
+aplus_queue.push({ action: 'aplus.setMetaInfo', arguments: ['trackDomain', 'qtedu.om.moe.edu.cn']  });
+</script>
+<script src='static/js/photoquery-2.0.0.js'></script>
+<script src="static/js/jquery.raty.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="surveyPicInfo" class="vote_part">
+    </div>
+    <script type="text/javascript">
+        var position = 'pc_xj';
+        var qqFrom = "";
+        $(function () {
+            if( null != position && position != undefined ) {
+                initCanShowSurveyType();
+            }
+        });
+        function initCanShowSurveyType() {
+            $.ajax({
+                url : 'https://my.chsi.com.cn/archive/survey/zswj/show.action',
+                method : 'POST',
+                data : {
+                    position : position
+                },
+                dataType: "json",
+                success : function (resultData) {
+                    if ( resultData.status == 0 && resultData.result!=null) {
+                        var res = resultData.result;
+                        if (res.shgldc) {
+                            //显示上海问卷
+                            var _url = '/archive/survey/shgl/show.action?from='+position;
+                            $("#shgldcId").attr('href',_url);
+                            $("#shgldcId").show();
+                        }
+                        if (res.surveyOne == null || res.surveyOne == undefined || res.surveyOne == '') {
+                            return;
+                        }
+                        showSurvey(res);
+                    }
+                }
+            });
+        }
+        /**
+         * 显示问卷
+         *
+         * @param res     问卷信息
+         *
+         */
+        function showSurvey(res) {
+
+            var vote1,vote2;
+            vote1 = dealVoteType(res.surveyOne);
+            vote2 = dealVoteType(res.surveyTwo);
+            // 设置顶部的banner 包括图片和链接
+            setVoteBanner(vote1,vote2);
+
+            // 就业问卷弹窗判断
+            if (res.jySurvey == null || res.jySurvey == undefined) {
+                return;
+            }
+            // 增加判断res.key没有值直接不弹窗
+            if (res.key == null || res.key == undefined || res.key == '') {
+                return;
+            }
+            var showTc = getSurveyTc(res.key);
+            // 是否有弹窗问卷显示，有  请求问卷内容显示在弹窗里，没有就结束
+            if (showTc) {
+                var ajaxVote = dealVoteType(res.jySurvey);
+                var _form= getSurveyFrom(res.jySurvey,true);
+                $.ajax({
+                    url:ajaxVote.ajaxUrl,
+                    type:'POST',
+                    data:{
+                        id:res.id,
+                        from:_form
+                    },
+                    success:function(dataValue) {
+                        gaTrackerOutboundLink('',ajaxVote.type, 'load',_form);
+                        layer.open({
+                            type: 1,
+                            title: false,
+                            area: ['1000px', '650px'],
+                            closeBtn: 0,
+                            shadeClose: false,
+                            skin: 'zydc_layer',
+                            content: '<span class="closeVoteBtn" onclick="closeVoteTc()"><i class="iconfont" title="关闭">&#xe65c;</i></span><div id="vote_tc_survey" data-key="'+res.key+'">'+dataValue+'</div>'
+                        });
+                    }
+                });
+            }
+
+        }
+        // 根据类型判断问卷，返回相应的链接和图片
+        /**
+         *  @param type   问卷类型
+         *  @return {}
+         *  @return {className}// className图样式
+         *  @return {bannerLink}// banner图链接
+         *  @return {ajaxUrl}// ajax请求问卷地址（就业问卷需要layer弹出来显示，发出的地址）
+         */
+        function dealVoteType(type){
+            var _surveyName = "",//问卷名称
+                _prefixUrl = "",//仅是前缀，ajax里需要补充index.action,a链接需要补充show.action
+                _className = "",//className 背景图样式
+                _isJywj = false;//是否是就业类型问卷，链接需要拼接
+            switch (type) {
+                //就业类问卷
+                case "gxbysgzbya":
+                case "gxbysgzbyb":
+                case "gxbysgzgza":
+                case "gxbysgzgzb":
+                    _surveyName = "高校毕业生跟踪调查问卷";
+                    _prefixUrl = "/archive/survey/"+type+"/";
+                    _className = "vote_bg_jygz";
+                    _isJywj = true;
+                    break;
+                case "xyxxzk":
+                    _surveyName = "高校校园学习状况调查";
+                    _prefixUrl = "/archive/survey/campus/";
+                    _className = "vote_bg_zxs";
+                    _isJywj = true;
+                    break;
+                case "bysgzdc":
+                    _surveyName = "高校毕业生跟踪调查问卷";
+                    _prefixUrl = "/archive/survey/bygz/";
+                    _className = "vote_bg_jygz";
+                    _isJywj = true;
+                    break;
+                case "xsgz":
+                    _surveyName = "高校学生跟踪调查问卷";
+                    _prefixUrl = "/archive/survey/xsgz/";
+                    _className = "vote_bg_jygz";
+                    _isJywj = true;
+                    break;
+                case "jyjzzk":
+                    _surveyName = "2025届高校毕业生就业进展调查";
+                    _prefixUrl = "/archive/survey/jyzk/";
+                    _className = "vote_bg_jyjz";
+                    _isJywj = true;
+                    break;
+                //满意度和学职链接 ,仅需要banner图和链接
+                case "zytj":
+                    //高考-专业推荐
+                    _prefixUrl = "/zyzsk/zytj/recommendContinue.action";
+                    _className = "vote_bg_zytj";
+                    break;
+                case "zymyd":
+                    //高考-专业满意度
+                    _prefixUrl = "/zyzsk/myd/specAppraisalWelcome.action";
+                    _className = "vote_bg_zymyd";
+                    break;
+                case "yxmyd":
+                    //高考-院校满意度
+                    _prefixUrl = "/zyzsk/myd/schAppraisalWelcome.action";
+                    _className = "vote_bg_yxmyd";
+                    break;
+                case "xzcp":
+                    //学职系统的测评
+                    _prefixUrl = "https://xz.chsi.com.cn/survey/index.action";
+                    _className = "vote_bg_xzcp";
+                    break;
+                default:
+            }
+            var obj={
+                className:_className,
+                bannerLink:_prefixUrl,
+                ajaxUrl:'',
+                name:_surveyName,
+                type:type
+            }
+            if(_isJywj){
+                if(type=='xyxxzk'){
+                    // 只有在校生问卷链接特殊，其他遵从一下规律
+                    obj.ajaxUrl = _prefixUrl+'show.action';
+                    obj.bannerLink = _prefixUrl+'index.action';
+                }else{
+                    obj.ajaxUrl = _prefixUrl+'index.action';
+                    obj.bannerLink = _prefixUrl+'show.action';
+                }
+            }
+            // 仅banner链接的from  弹窗一定是false
+            obj.bannerLink = obj.bannerLink+"?from="+getSurveyFrom(type,false);
+            return obj;
+        }
+        // 设置顶部问卷banner条-图片和链接
+        function setVoteBanner(vote1,vote2){
+            var tempHtml = '';
+            tempHtml = '<a href="'+vote1.bannerLink+'" onmousedown="clickVoteGa(this,\''+vote1.type+'\')" target="_blank" class="'+vote1.className+'">'+vote1.name+'</a><a href="'+vote2.bannerLink+'" target="_blank"  onmousedown="clickVoteGa(this,\''+vote2.type+'\')"  class="'+vote2.className+'">'+vote2.name+'</a>';
+            $('#surveyPicInfo').addClass('vote_part_show').html(tempHtml);
+        }
+        function getSurveyFrom(type,showTc) {
+            if ( position == "pc_main") {
+                return showTc ? "archive-main-tc" : "archive-main";
+            }
+            if ( position == "pc_xj") {
+                return type == "xyxxzk" ? "A" : "archive-xjxx";
+            }
+            if ( position == "pc_xl" ) {
+                return "archive-xlxx";
+            }
+            if ( position == "pc_xlbab") {
+                if(qqFrom){
+                    return showTc ? qqFrom : qqFrom+'-banner';
+                }else{
+                    return showTc ? 'archive-xlbabtc' : 'archive-xlbab-banner';
+                }
+            }
+        }
+        function getSurveyTc(cookieName){
+            // 是否显示弹窗【变量】逻辑开始（仅在首页和在线验证有此判断） ，key是cookie的name  如果没值  显示弹窗，
+            var showTc =false;//默认先不显示
+            if(cookieName){
+                //就业类问卷才有cookieName，其他（满意度、学职）无
+                var wjCookTc=getCookie(cookieName);
+                if(!wjCookTc){
+                    // 没值：1、设置值；2、显示弹窗。(有值的话，不显示弹窗)
+
+                    showTc =true;
+                }
+            }
+            return showTc;
+        }
+        function closeVoteTc(reloadFlag){
+            // 关闭的话，增加cookie
+            var cookieName = '';
+            if(document.getElementById('vote_tc_survey')){
+                cookieName = document.getElementById('vote_tc_survey').getAttribute('data-key');
+            }
+            if(cookieName){
+                addCookie(cookieName,'true',7,'archive');
+            }
+            layer.closeAll();
+            if(reloadFlag){
+                window.location.reload();
+            }
+        }
+        function clickVoteGa(obj,type){
+            gaTrackerOutboundLink(obj,type, 'click',position);
+        }
+    </script>
+
+<div class="xj_top">
+    <span class='find_xj'>您一共有<span class="xj_num"> 2 </span>个学籍</span>
+    还有学籍没有显示出来？ <a href='###' onclick="bindxjreport();return false;">尝试绑定学籍</a>　|　<a href='https://www.chsi.com.cn/help/cxfw.jsp' target="_blank">学籍查询范围</a>
+</div>
+
+    <div class="clearfix xw-flex-wrap chsi-font">
+        <div class="m-left xj-left main-block border-shadow ">
+            <div id="xj_top_1" class="mb-title"></div>
+            <span class='mb-title-a'><i class="iconfont">&#xe685;</i><a href="/archive/bab/xj/show.action?trnd=55723677208012609828908453694410#zxyz_1" >查看该学籍的在线验证报告</a></span>
+            <div class="xj-l-m clearfix">
+                <div class="xj-m-left">
+                    <div class="pic">
+                        
+                            <img src="static/picture/no-photo.png" align="absmiddle" width="120" height="160" alt="录取照片"/>
+                        
+                        
+                    </div>
+                    <p>录取照片</p>
+                    <div class="pic">
+                        
+                        
+                            <img id="1" src="static/picture/no-photo.png" align="absmiddle" width="120" height="160" alt="学历照片"/>
+                        
+                        <div id="pic_tips_1"></div>
+                    </div>
+                    
+                    
+                        <p>学历照片</p>
+                    
+                </div>
+                <div id="xjMR_1" class="xj-m-r">
+                   
+                </div>
+                <div class="clearFloat">&nbsp;</div>
+            </div>
+            <div class="txjd-sanjiao-wrap">
+                <div class="txjd-sanjiao txjd-sanjiao-border"></div>
+                <div class="txjd-sanjiao"></div>
+            </div>
+            <div id="pic_query_result_1"></div>
+            
+            <!--图像采集码-->
+            
+                <div class="jd_result clearfix">
+                    <div class="left">
+                        <span class="jd_text">毕业生图像采集环节出示图像采集码</span>
+                    </div>
+                    <div class="right">
+                        <a class="big-btn photo_right" id="txcjm_1" onClick="showTxcjm('ua0ntmeg33xxy6h7');return false;">查看图像采集码</a>
+                    </div>
+                    <div class="clearFloat">&nbsp;</div>
+                </div>
+            
+        </div>
+        <div class="m-right border-shadow ">
+            <div id="myd_ua0ntmeg33xxy6h7"></div>
+            <a href="https://chsi.wanfangtech.net/" target="_blank"  onmousedown="clickLwcc(this)"  class="lwcc-rk-btn"><img src='static/picture/lwcx-1.png' alt="毕业论文查重" width="230" /></a>
+            <a href="https://my.chsi.com.cn/archive/zybh/show.action" target="_blank" class="green-btn big-btn zybh-rk-btn">学科/专业变化查询</a>
+        </div>
+        <div class="clearFloat">&nbsp;</div>
+        <script>
+            $(function(){
+                xjmydtj("ua0ntmeg33xxy6h7");
+                $("#xj_top_1").text('本科-中南财经政法大学-计算机科学与技术');
+                var _xjDetail_1 = "<table class='gdjy-table'>";
+                    _xjDetail_1   +="<tr><th width='130'>姓名：</th><td width='206'></td><th width='100'>性别：</th><td></td></tr>";
+                    _xjDetail_1   +="<tr><th>出生日期：</th><td></td><th>民族：</th><td></td></tr>";
+                    _xjDetail_1   +="<tr><th>证件号码：</th><td></td><th>学校名称：</th><td></td></tr>";
+                    _xjDetail_1   +="<tr><th>层次：</th><td></td><th>专业：</th><td></td></tr>";
+                    _xjDetail_1   +="<tr><th>学制：</th><td></td><th>学历类别：</th><td></td></tr>";
+                    _xjDetail_1   +="<tr><th>学习形式：</th><td></td><th>分院：</th><td></td></tr>";
+                    _xjDetail_1   +="<tr><th>系所：</th><td></td><th>班级：</th><td></td></tr>";
+                    _xjDetail_1   +="<tr><th>学号：</th><td></td><th>入学日期：</th><td></td></tr>";
+                    _xjDetail_1   +="<tr><th>学籍状态：</th><td></td><th>预计毕业日期：</th><td></td></tr>";
+                    _xjDetail_1+="</table>";
+                $("#xjMR_1").html(_xjDetail_1);                
+            });
+            photoQueryCheck("ua0ntmeg33xxy6h7",'xj',"1");
+        </script>
+    </div>
+
+    <div class="clearfix xw-flex-wrap chsi-font">
+        <div class="m-left xj-left main-block border-shadow marginB0">
+            <div id="xj_top_2" class="mb-title"></div>
+            <span class='mb-title-a'><i class="iconfont">&#xe685;</i><a href="/archive/bab/xj/show.action?trnd=55723677208012609828908453694410#zxyz_2" >查看该学籍的在线验证报告</a></span>
+            <div class="xj-l-m clearfix">
+                <div class="xj-m-left">
+                    <div class="pic">
+                        
+                            <img src="static/picture/no-photo.png" align="absmiddle" width="120" height="160" alt="录取照片"/>
+                        
+                        
+                    </div>
+                    <p>录取照片</p>
+                    <div class="pic">
+                        
+                            <img id="1" src="static/picture/no-photo.png" align="absmiddle" width="120" height="160" alt="学历照片"/>
+                        
+                        
+                        <div id="pic_tips_2"></div>
+                    </div>
+                    
+                    
+                        <p>学历照片</p>
+                    
+                </div>
+                <div id="xjMR_2" class="xj-m-r">
+                   
+                </div>
+                <div class="clearFloat">&nbsp;</div>
+            </div>
+            <div class="txjd-sanjiao-wrap">
+                <div class="txjd-sanjiao txjd-sanjiao-border"></div>
+                <div class="txjd-sanjiao"></div>
+            </div>
+            <div id="pic_query_result_2"></div>
+            
+            <!--图像采集码-->
+            
+        </div>
+        <div class="m-right border-shadow marginB0">
+            <div id="myd_etmm88izczmucvdz"></div>
+            <a href="https://chsi.wanfangtech.net/" target="_blank"  onmousedown="clickLwcc(this)"  class="lwcc-rk-btn"><img src='static/picture/lwcx-1.png' alt="毕业论文查重" width="230" /></a>
+            <a href="https://my.chsi.com.cn/archive/zybh/show.action" target="_blank" class="green-btn big-btn zybh-rk-btn">学科/专业变化查询</a>
+        </div>
+        <div class="clearFloat">&nbsp;</div>
+        <script>
+            $(function(){
+                xjmydtj("etmm88izczmucvdz");
+                $("#xj_top_2").text('研究生-中南财经政法大学-计算机科学与技术');
+                var _xjDetail_2 = "<table class='gdjy-table'>";
+                    _xjDetail_2   +="<tr><th width='130'>姓名：</th><td width='206'></td><th width='100'>性别：</th><td></td></tr>";
+                    _xjDetail_2   +="<tr><th>出生日期：</th><td></td><th>民族：</th><td></td></tr>";
+                    _xjDetail_2   +="<tr><th>证件号码：</th><td></td><th>学校名称：</th><td></td></tr>";
+                    _xjDetail_2   +="<tr><th>层次：</th><td></td><th>专业：</th><td></td></tr>";
+                    _xjDetail_2   +="<tr><th>学制：</th><td></td><th>学历类别：</th><td></td></tr>";
+                    _xjDetail_2   +="<tr><th>学习形式：</th><td></td><th>分院：</th><td></td></tr>";
+                    _xjDetail_2   +="<tr><th>系所：</th><td></td><th>班级：</th><td></td></tr>";
+                    _xjDetail_2   +="<tr><th>学号：</th><td></td><th>入学日期：</th><td></td></tr>";
+                    _xjDetail_2   +="<tr><th>学籍状态：</th><td></td><th>离校日期：</th><td></td></tr>";
+                    _xjDetail_2+="</table>";
+                $("#xjMR_2").html(_xjDetail_2);                
+            });
+            photoQueryCheck("etmm88izczmucvdz",'xj',"2");
+        </script>
+    </div>
+
+<script>
+    function xjmydtj( archiveId ) {
+        var $myd = $('#myd_'+archiveId );
+        $.ajax({
+            url:'/archive/survey/myd/xj/show.action',
+            type:'POST',
+            data:{
+                xjid:archiveId,
+            },
+            beforeSend:function(){
+                $myd.html("<div id='loading-block'><img src='static/picture/loading.gif' />正在加载中</div>");
+            },
+            success:function(dataValue) {
+                $myd.html(dataValue);
+            }
+        });
+    }
+</script>
+
+
+
+<!--b谈层测试页面-->
+<div class="modal fade" id="bPlan" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog zydc-modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×
+                </button>
+                <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-hidden="true">×
+                </button>
+                <h4 class="modal-title" id="myModalLabel"></h4>
+            </div>
+            <div class="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden"  id="urlTrnd" value="55723677208012609828908453694410"/>
+<script>
+$(window).load(function() {
+     //设置箭头
+    setTimeout(function(){
+        if($('.jd_result').length>0){
+            $(".jd_result").each(function () {
+                $(this).parents('.xj-left').children('.txjd-sanjiao-wrap').show();
+            })
+        }
+    },200);
+});
+/*检查照片评价层*/
+function  appraisalFromCookie(tb){
+    var cookieValue =  getCookie("appraisal_"+tb);
+    if( cookieValue != "noAppraisal" ){
+        $('.main-block').eq(tb).find('.appraisal').click();
+    }
+}
+/*评价照片层的取消按钮事件*/
+function  addAppraisalCookie(tb){
+    var cookieName = "appraisal_"+tb;
+    addCookie(cookieName,"noAppraisal");
+    $('#myModal').modal('hide')
+}
+/*修改图片校对结论*/
+function  collateAgain(tbCount){
+   $("#collate_again_"+tbCount).hide();
+   $("#collate_again_1_"+tbCount).show();
+   $("#collate_again_2_"+tbCount).show();
+   return false;
+}
+/*校对结论生效*/
+function  zpjdsxInfo(tbCount){
+   $("#collate_again_"+tbCount).hide();
+   $("#zpjdsx_"+tbCount).html("校对结论已生效。");
+   $("#zpjdsx_"+tbCount).show();
+   return false;
+}
+/*学历照片评价*/
+function appraisalPhoto(xjid){
+    var id = xjid;
+    var tb = $("#tb_"+id).val();
+    $.post(
+        '/archive/gdjy/zp/pj/photoAppraisal.action',
+        {'archiveId':id,'tb':tb},
+        function (html) {
+            $("#myModal .modal-title").html("学历照片评价");
+            $("#myModal .modal-body").html(html);
+            $('#myModal').modal('show');
+        }
+    );
+}
+/*学历照片正确*/
+function updatezpinfo(zpformid){
+   $("#myModal .modal-body").html("<div class='collate_tip01'>提示：学历照片校对结论将在24小时后正式提交至就读院校学籍管理部门；<br />　　　正式提交前校对结论可以修改；<br />　　　正式提交后若仍需修改，请联系就读院校学籍管理部门。</div><div class='center' style='margin:10px;'><input type='button' class='button4' onclick='updatezpjdxx("+zpxxformid+")' value='确定' />  <input type='button' class='button4' onclick='closedialog()' value='返回' /></div>");
+    var zpxxformid = zpformid;
+    $("#collate_"+zpxxformid).find(".zpxxCollateStatus").val("1");
+    var ops = {
+        type:'post',
+        url:'/archive/gdjy/zp/jd/editzpjdxx.action',
+        dataType:'html',
+        success:function(data){
+            $("#myModal .modal-title").html("学历照片完全正确");
+            $("#myModal .modal-body").html(data);
+            $('#myModal').modal('show');
+        }
+    };
+    $("#collate_"+zpxxformid).ajaxSubmit (ops);
+    //$("#dialog").dialog('option', 'buttons', null);
+}
+/*学历照片错误*/
+function editzpjdxx(zpformid){
+    var zpxxformid = zpformid;
+    $("#collate_"+zpxxformid).find(".zpxxCollateStatus").val("0");
+    var ops = {
+        type:'post',
+        url:'/archive/gdjy/zp/jd/editzpjdxx.action',
+        dataType:'html',
+        success:function(data){
+            $("#myModal .modal-title").html("学历照片错误原因");
+            $("#myModal .modal-body").html(data);
+            $('#myModal').modal('show');
+        }
+    };
+    $("#collate_"+zpxxformid).ajaxSubmit (ops);
+   //$("#dialog").dialog('option', 'buttons', null);
+}
+/*更新图片校对信息*/
+function updatezpjdxx(tb){
+    var zpxxformid = tb+1;
+    var trnd = $("#urlTrnd").val();
+    $("#check_collate_csrf_"+zpxxformid).val('b9be528ef7102c989b5bfe2ba84ec7a3')
+    $("#collate_"+zpxxformid).attr('action','/archive/gdjy/zp/jd/updatezpjdxx.action');
+    $("#collate_"+zpxxformid).submit();
+}
+//绑定学籍
+function bindxjreport() {
+    $.ajax({
+        type: 'GET',
+        data: {
+
+        },
+        url: '/archive/gdjy/xj/showbind.action',
+        dataType: 'html',
+        success: function(data) {
+            $("#myModal .modal-title").html("学籍绑定");
+            $("#myModal .modal-body").html(data);
+            $('#myModal').modal('show');
+        }
+    });
+}
+function showTxcjm(archiveId) {
+    layer.closeAll();
+    var html = "<span class='layui-layer-setwin'><a class='layui-layer-ico layui-layer-close layui-layer-close1' onclick='closeEwm()' href='javascript:;'></a></span>";
+
+    html += "<div class='ewm-img-wrap'><div class='ewm-load-wrap'><img src='static/picture/loading-dot.gif'>图片加载中</div><img class='ewm-img' onload=\"$(this).css('visibility','visible').prev().hide();\" onerror=\"this.onerror=null;$(this).prev().hide();$('.down-btn').hide();this.src='static/picture/no-txcjm.png';\" src='/archive/gdjy/txcjm/show.action?id="+archiveId+"' /></div>"
+        + "<a class='green-btn mid-btn down-btn' href='/archive/gdjy/txcjm/download.action?id="+archiveId+"'>保存图片</a>";
+    layer.open({
+        type: 1,
+        title: '',
+        // closeBtn:0,
+        skin: 'txewm-layer', //样式类名
+        content: html,
+        resize:false,
+        area:['350px','625px']
+    });
+}
+function closeEwm(){
+    layer.closeAll();
+}
+function addCookie(name,value){
+  var cookieString=name+"="+escape(value);
+  document.cookie=cookieString;
+  document.cookie.setSecure=true;//只允许在https环境下使用cookie
+}
+function getCookie(name){
+    var strCookie=document.cookie;
+    var arrCookie=strCookie.split("; ");
+    for(var i=0;i<arrCookie.length;i++){
+        var arr=arrCookie[i].split("=");
+        if(arr[0]==name)return arr[1];
+    }
+    return "";
+}
+function loadbinddialog(){
+    //没有学籍信息，这是一个弹层
+    var temp  ='<p style="text-align:left">系统没有找到您的在校生学籍信息，有可能是因为您注册时填写的姓名和证件号码两项与学校上报的学籍注册数据不相同导致的。<br/><br/></p>';
+    temp +='<p style="text-align:left">1、查看您注册时填写的姓名和证件号码信息&nbsp;<a href="https://account.chsi.com.cn/account/account!show" target="_blank" class="color5">点击查看</a><br/></p>';
+    temp +='<p style="text-align:left">2、姓名和证件号码无误，我还有学籍没显示出来&nbsp;<a href="###" aria-hidden="true" onclick=" bindxjreport(); return false;" class="color5">找找看？</a><br/><br/></p>';
+    temp +='<div class="modal-btn" style="margin-top:40px;"><a class="green-btn mid-btn" data-dismiss="modal" aria-hidden="true" >关闭</a></div>';
+
+    $("#myModal .modal-title").html("没有学籍");
+    $("#myModal .modal-body").html(temp);
+    $('#myModal').modal('show');
+}
+//解决2个谈层，关闭一个，就业调查的滚动条不管用问题
+$('.modal').on('hidden.bs.modal', function () {
+    if($("#bPlan").hasClass('in')){
+        $("body").addClass("modal-open");
+    }
+})
+// 初始化没有学籍的弹层开始
+
+
+    $(function(){
+       //自动检测出照片评价层
+        var tb = 0;
+        var countSize = $('.main-block').size();
+        if( tb >= countSize ){
+            tb = 0;
+        }
+        appraisalFromCookie(tb);
+    })
+
+
+    //毕业论文查重点击次数
+    function clickLwcc(obj){
+        gaTrackerOutboundLink(obj,'lwcc', 'click', 'fromxj');
+    }
+</script>
+            </div>
+        </div>
+    </div>
+    
+
+
+
+
+
+
+
+<div class="footer">
+    <a href="https://www.chsi.com.cn/" target="_blank">学信网</a>　|　<a href="/archive/help/index.action" target="_blank">帮助中心</a>　|　Copyright © 2003-2025 学信网 All Rights Reserved<br/>
+    <a href="https://beian.miit.gov.cn" target="_blank">京ICP备19004913号-1</a>　<a href="https://www.beian.gov.cn/portal/registerSystemInfo?recordcode=11010202009747" target="_blank" ><img src='static/picture/jgwab.svg' style="vertical-align: middle;margin-bottom: 2px;margin-left: 8px;" /> 京公网安备11010202009747号</a>
+</div>    
+    <div id="loader"></div>
+<script type="text/javascript" src='static/js/jquery.validate.min.js'></script>
+<script type="text/javascript" src='static/js/jquery.form.js'></script>
+<script type="text/javascript" src='static/js/bootstrap.min.js'></script>
+<script type="text/javascript" src='static/js/bootstrap-datetimepicker.min.js'></script>
+<script type="text/javascript" src='static/js/not-ie.min.js'></script>
+<link rel="stylesheet" href='static/css/webuploader.css' />
+<script src='static/js/webuploader.js'></script>
+
+</body>
+</html>
